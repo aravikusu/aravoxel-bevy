@@ -3,7 +3,6 @@ use std::f32::consts::PI;
 use bevy::prelude::*;
 use bevy::render::mesh::{Indices, PrimitiveTopology, VertexAttributeValues};
 use bevy::render::render_asset::RenderAssetUsages;
-use rand::Rng;
 use crate::voxel::chunk::Chunk;
 use crate::voxel::chunk_mesh::ChunkMesh;
 
@@ -92,16 +91,7 @@ fn setup_bevy_mesh(chunk_mesh: ChunkMesh) -> Mesh {
 
     mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, chunk_mesh.vertices);
     mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, chunk_mesh.normals);
-
-    if let Some(VertexAttributeValues::Float32x3(positions)) =
-        mesh.attribute(Mesh::ATTRIBUTE_POSITION)
-    {
-        let colors: Vec<[f32; 4]> = positions
-            .iter()
-            .map(|[r, g, b]| [0.0, 1.0, 0.0, 1.])
-            .collect();
-        mesh.insert_attribute(Mesh::ATTRIBUTE_COLOR, colors);
-    }
+    mesh.insert_attribute(Mesh::ATTRIBUTE_COLOR, chunk_mesh.colors);
 
     mesh.insert_indices(Indices::U32(chunk_mesh.indices));
 

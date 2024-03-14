@@ -52,10 +52,14 @@ impl ChunkMesh {
             }
         }
 
+        // Clown vomit colors
+        // Obviously temporary...
         for _v in &self.vertices {
             let mut rng = rand::thread_rng();
-            let color = rng.gen_range(0.0..1.0) as f32;
-            self.colors.extend([[color, color, color, color]; 4])
+            let color1 = rng.gen_range(0.0..1.0) as f32;
+            let color2 = rng.gen_range(0.0..1.0) as f32;
+            let color3 = rng.gen_range(0.0..1.0) as f32;
+            self.colors.push([color1, color2, color3, 1.0]);
         }
     }
 

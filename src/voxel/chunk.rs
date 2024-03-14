@@ -1,9 +1,7 @@
 use std::collections::HashMap;
-use bevy::log::debug;
 use bevy::math::{IVec3, Vec2};
 use libnoise::{Generator, Source};
-use crate::voxel::chunk_mesh::ChunkMesh;
-use crate::voxel::util::{CHUNK_AREA, CHUNK_SIZE, CHUNK_VOL, voxel_index};
+use crate::voxel::util::{CHUNK_SIZE, CHUNK_VOL, voxel_index};
 use crate::voxel::voxel::Voxel;
 
 #[derive(Clone)]
