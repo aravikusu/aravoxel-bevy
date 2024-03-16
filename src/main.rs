@@ -2,11 +2,13 @@ use bevy::prelude::*;
 use bevy::window::PresentMode;
 use crate::actors::debug_camera::DebugCameraPlugin;
 use crate::global::{GlobalPlugin, KeyBinds};
+use crate::ui::debug::DebugUIPlugin;
 use crate::voxel::world::VoxelWorldPlugin;
 
 mod actors;
 mod global;
 mod voxel;
+mod ui;
 
 fn main() {
     App::new()
@@ -34,7 +36,8 @@ fn main() {
         .add_plugins((
             GlobalPlugin,
             DebugCameraPlugin,
-            VoxelWorldPlugin
+            VoxelWorldPlugin,
+            DebugUIPlugin
         ))
         .run();
 }
