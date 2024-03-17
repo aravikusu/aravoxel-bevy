@@ -59,6 +59,10 @@ impl Chunk {
             if !voxel.voxel_type.is_visible() && voxel.world_position.y < 10 {
                 voxel.voxel_type = VoxelType::WATER;
             }
+
+            if voxel.voxel_type.is_visible() && voxel.world_position.y > 23 {
+                voxel.voxel_type = VoxelType::STONE;
+            }
         }
     }
 

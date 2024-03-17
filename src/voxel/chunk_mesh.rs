@@ -5,6 +5,7 @@ use rand::Rng;
 use crate::global::Settings;
 use crate::voxel::chunk::Chunk;
 use crate::voxel::util::{CHUNK_SIZE, voxel_index};
+use crate::voxel::voxel::{Voxel, VoxelType};
 
 pub struct ChunkMesh {
     pub vertices: Vec<[f32; 3]>,
@@ -42,14 +43,7 @@ impl ChunkMesh {
                             continue;
                         }
 
-                        let local_pos = IVec3::new(x, y, z);
-                        let world_pos = IVec3::new(
-                            x + chunk.position.x * CHUNK_SIZE,
-                            y + chunk.position.y * CHUNK_SIZE,
-                            z + chunk.position.z * CHUNK_SIZE,
-                        );
-
-                        self.create_voxel_data(chunk, local_pos, world_pos, chunks);
+                        self.create_voxel_data(chunk, voxel, chunks);
 
                         //self.colors.push(voxel.voxel_type.type_to_color())
                     }
@@ -79,18 +73,17 @@ impl ChunkMesh {
     fn create_voxel_data(
         &mut self,
         chunk: &Chunk,
-        local_pos: IVec3,
-        world_pos: IVec3,
+        voxel: &Voxel,
         world_chunks: &HashMap<IVec3, Chunk>,
     ) {
-        let lx = local_pos.x;
-        let ly = local_pos.y;
-        let lz = local_pos.z;
+        let lx = voxel.local_position.x;
+        let ly = voxel.local_position.y;
+        let lz = voxel.local_position.z;
 
         // World position of Voxel
-        let wx = world_pos.x as f32;
-        let wy = world_pos.y as f32;
-        let wz = world_pos.z as f32;
+        let wx = voxel.world_position.x as f32;
+        let wy = voxel.world_position.y as f32;
+        let wz = voxel.world_position.z as f32;
 
         // Check if there is a solid voxel above
         if chunk.is_void(IVec3::new(lx, ly + 1, lz), world_chunks) {
@@ -102,7 +95,8 @@ impl ChunkMesh {
                 [wx + -0.5, wy + 0.5, wz + 0.5],
             ]);
 
-            self.normals.extend([[0.0, 1.0, 0.0]; 4])
+            self.normals.extend([[0.0, 1.0, 0.0]; 4]);
+            self.colorize_vertices(&voxel.voxel_type);
         }
 
         // Check under...
@@ -116,7 +110,8 @@ impl ChunkMesh {
                     [wx + -0.5, wy + -0.5, wz + 0.5],
                 )
             );
-            self.normals.extend([[0.0, -1.0, 0.0]; 4])
+            self.normals.extend([[0.0, -1.0, 0.0]; 4]);
+            self.colorize_vertices(&voxel.voxel_type);
         }
 
         // Right
@@ -131,7 +126,8 @@ impl ChunkMesh {
                 )
             );
 
-            self.normals.extend([[1.0, 0.0, 0.0]; 4])
+            self.normals.extend([[1.0, 0.0, 0.0]; 4]);
+            self.colorize_vertices(&voxel.voxel_type);
         }
 
         // Left
@@ -145,7 +141,8 @@ impl ChunkMesh {
                     [wx + -0.5, wy + 0.5, wz + -0.5],
                 )
             );
-            self.normals.extend([[-1.0, 0.0, 0.0]; 4])
+            self.normals.extend([[-1.0, 0.0, 0.0]; 4]);
+            self.colorize_vertices(&voxel.voxel_type);
         }
 
         // Behind
@@ -159,7 +156,8 @@ impl ChunkMesh {
                     [wx + 0.5, wy + -0.5, wz + 0.5],
                 )
             );
-            self.normals.extend([[0.0, 0.0, 1.0]; 4])
+            self.normals.extend([[0.0, 0.0, 1.0]; 4]);
+            self.colorize_vertices(&voxel.voxel_type);
         }
 
         // In front
@@ -174,7 +172,8 @@ impl ChunkMesh {
                 )
             );
 
-            self.normals.extend([[1.0, 0.0, -1.0]; 4])
+            self.normals.extend([[1.0, 0.0, -1.0]; 4]);
+            self.colorize_vertices(&voxel.voxel_type);
         }
     }
 
@@ -188,5 +187,9 @@ impl ChunkMesh {
             .collect();
 
         self.indices.extend(vec);
+    }
+
+    fn colorize_vertices(&mut self, voxel_type: &VoxelType) {
+        self.colors.extend([voxel_type.type_to_color(); 4]);
     }
 }
