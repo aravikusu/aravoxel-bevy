@@ -26,6 +26,20 @@ impl Default for KeyBinds {
     }
 }
 
+#[derive(Resource)]
+pub struct Settings {
+    pub clown_vomit: bool,
+}
+
+impl Default for Settings {
+    fn default() -> Self {
+        Self {
+            clown_vomit: true,
+        }
+    }
+}
+
+
 pub struct GlobalPlugin;
 
 impl Plugin for GlobalPlugin {

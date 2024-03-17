@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy::window::PresentMode;
 use crate::actors::debug_camera::DebugCameraPlugin;
-use crate::global::{GlobalPlugin, KeyBinds};
+use crate::global::{GlobalPlugin, KeyBinds, Settings};
 use crate::ui::debug::DebugUIPlugin;
 use crate::voxel::world::VoxelWorldPlugin;
 
@@ -13,6 +13,7 @@ mod ui;
 fn main() {
     App::new()
         .insert_resource(KeyBinds::default())
+        .insert_resource(Settings::default())
         .add_plugins((
             DefaultPlugins.set(WindowPlugin {
                 primary_window: Some(Window {
