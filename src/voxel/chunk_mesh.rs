@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 use bevy::math::IVec3;
+use bevy::prelude::ResMut;
 use rand::Rng;
+use crate::global::Settings;
 use crate::voxel::chunk::Chunk;
 use crate::voxel::util::{CHUNK_SIZE, voxel_index};
 
@@ -28,6 +30,7 @@ impl ChunkMesh {
         &mut self,
         chunk: &Chunk,
         chunks: &HashMap<IVec3, Chunk>,
+        settings: &ResMut<Settings>,
     ) {
         for x in 0..CHUNK_SIZE {
             for y in 0..CHUNK_SIZE {
@@ -35,7 +38,7 @@ impl ChunkMesh {
                     let index = voxel_index(x, y, z);
 
                     if let Some(voxel) = chunk.voxels.get(index) {
-                        if !voxel.is_solid {
+                        if !voxel.voxel_type.is_visible() {
                             continue;
                         }
 
@@ -47,19 +50,21 @@ impl ChunkMesh {
                         );
 
                         self.create_voxel_data(chunk, local_pos, world_pos, chunks);
+
+                        //self.colors.push(voxel.voxel_type.type_to_color())
                     }
                 }
             }
         }
 
-        // Clown vomit colors
-        // Obviously temporary...
-        for _v in &self.vertices {
-            let mut rng = rand::thread_rng();
-            let color1 = rng.gen_range(0.0..1.0) as f32;
-            let color2 = rng.gen_range(0.0..1.0) as f32;
-            let color3 = rng.gen_range(0.0..1.0) as f32;
-            self.colors.push([color1, color2, color3, 1.0]);
+        if settings.clown_vomit {
+            for _v in &self.vertices {
+                let mut rng = rand::thread_rng();
+                let color1 = rng.gen_range(0.0..1.0) as f32;
+                let color2 = rng.gen_range(0.0..1.0) as f32;
+                let color3 = rng.gen_range(0.0..1.0) as f32;
+                self.colors.push([color1, color2, color3, 1.0]);
+            }
         }
     }
 

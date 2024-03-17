@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use bevy::math::{IVec3, Vec2};
 use libnoise::{Generator, Source};
 use crate::voxel::util::{CHUNK_SIZE, CHUNK_VOL, voxel_index};
-use crate::voxel::voxel::Voxel;
+use crate::voxel::voxel::{Voxel, VoxelType};
 
 #[derive(Clone)]
 pub struct Chunk {
@@ -14,7 +14,7 @@ impl Chunk {
     pub fn new(position: IVec3) -> Self {
         Self {
             position,
-            voxels: vec![Voxel { is_solid: false }; CHUNK_VOL as usize],
+            voxels: vec![Voxel::default(); CHUNK_VOL as usize],
         }
     }
 
@@ -34,14 +34,30 @@ impl Chunk {
                 let some_pos = Vec2::new(wx as f32, wz as f32) * 0.01;
                 let sample = noise.sample([some_pos.x as f64, some_pos.y as f64]);
 
+                // Determine which voxels are going to be solid
                 let world_height = (sample * 32.0 + 32.0) as i32;
                 let local_height = i32::min(world_height - new_pos.y, CHUNK_SIZE);
 
-                for y in 0..local_height {
+                for y in 0..CHUNK_SIZE {
                     let index = voxel_index(x, y, z);
+                    self.voxels[index].local_position = IVec3::new(x, y, z);
+                    self.voxels[index].world_position = IVec3::new(
+                        x + self.position.x * CHUNK_SIZE,
+                        y + self.position.y * CHUNK_SIZE,
+                        z + self.position.z * CHUNK_SIZE,
+                    );
 
-                    self.voxels[index].is_solid = true;
+                    if y < local_height {
+                        self.voxels[index].voxel_type = VoxelType::GRASS;
+                    }
                 }
+            }
+        }
+
+        // Test
+        for voxel in &mut self.voxels {
+            if !voxel.voxel_type.is_visible() && voxel.world_position.y < 10 {
+                voxel.voxel_type = VoxelType::WATER;
             }
         }
     }
@@ -63,7 +79,7 @@ impl Chunk {
             // Voxel exists inside our chunk. Get the index and check it.
             let idx = voxel_index(x, y, z);
             if let Some(voxel) = self.voxels.get(idx) {
-                return !voxel.is_solid;
+                return voxel.voxel_type.should_render();
             }
         } else {
             // Voxel exceeds chunk boundaries.
@@ -121,7 +137,7 @@ impl Chunk {
                 let voxel_idx = voxel_index(x, y, z);
 
                 if let Some(voxel) = chunk.voxels.get(voxel_idx) {
-                    return !voxel.is_solid;
+                    return !voxel.voxel_type.is_visible();
                 }
 
                 true

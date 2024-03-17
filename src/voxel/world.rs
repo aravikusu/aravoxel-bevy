@@ -3,6 +3,7 @@ use std::f32::consts::PI;
 use bevy::prelude::*;
 use bevy::render::mesh::{Indices, PrimitiveTopology, VertexAttributeValues};
 use bevy::render::render_asset::RenderAssetUsages;
+use crate::global::Settings;
 use crate::voxel::chunk::Chunk;
 use crate::voxel::chunk_mesh::ChunkMesh;
 
@@ -44,7 +45,8 @@ fn setup_world(
     mut commands: Commands,
     mut voxel_world: ResMut<VoxelWorld>,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>
+    mut materials: ResMut<Assets<StandardMaterial>>,
+    mut settings: ResMut<Settings>
 ) {
     for x in 0..9 {
         for y in 0..9 {
@@ -60,7 +62,7 @@ fn setup_world(
 
     for (_chunk_pos, chunk) in &voxel_world.chunks {
         let mut chunk_mesh = ChunkMesh::default();
-        chunk_mesh.build_chunk_mesh(&chunk, &voxel_world.chunks);
+        chunk_mesh.build_chunk_mesh(&chunk, &voxel_world.chunks, &settings);
 
         let mesh_handle = meshes.add(setup_bevy_mesh(chunk_mesh));
 
