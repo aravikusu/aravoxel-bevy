@@ -9,6 +9,7 @@ pub struct KeyBinds {
     pub move_right: KeyCode,
     pub move_ascend: KeyCode,
     pub move_descend: KeyCode,
+    pub sprint: KeyCode,
     pub toggle_cursor: KeyCode,
 }
 
@@ -21,6 +22,7 @@ impl Default for KeyBinds {
             move_right: KeyCode::KeyD,
             move_ascend: KeyCode::Space,
             move_descend: KeyCode::ControlLeft,
+            sprint: KeyCode::ShiftLeft,
             toggle_cursor: KeyCode::Escape,
         }
     }
@@ -34,7 +36,7 @@ pub struct Settings {
 impl Default for Settings {
     fn default() -> Self {
         Self {
-            clown_vomit: true,
+            clown_vomit: false,
         }
     }
 }

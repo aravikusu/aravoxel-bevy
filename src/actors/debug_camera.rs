@@ -54,10 +54,16 @@ fn spawn_debug_camera(mut commands: Commands) {
 fn move_debug_camera(
     mut query: Query<&mut Transform, With<DebugCamera>>,
     key_binds: Res<KeyBinds>,
-    settings: Res<DebugCameraSettings>,
+    mut settings: ResMut<DebugCameraSettings>,
     keys: Res<ButtonInput<KeyCode>>,
     time: Res<Time>,
 ) {
+    settings.speed = if keys.any_pressed([key_binds.sprint]) {
+        24.0
+    } else {
+        12.0
+    };
+
     // Iterate through the query, even if there should only be one
     for mut transform in query.iter_mut() {
         let mut velocity = Vec3::ZERO;
