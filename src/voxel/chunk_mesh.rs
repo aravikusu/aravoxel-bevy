@@ -44,14 +44,13 @@ impl ChunkMesh {
                         }
 
                         self.create_voxel_data(chunk, voxel, chunks);
-
-                        //self.colors.push(voxel.voxel_type.type_to_color())
                     }
                 }
             }
         }
 
         if settings.clown_vomit {
+            self.colors.clear();
             for _v in &self.vertices {
                 let mut rng = rand::thread_rng();
                 let color1 = rng.gen_range(0.0..1.0) as f32;
@@ -64,11 +63,10 @@ impl ChunkMesh {
 
     /// Creates the ModelVertex vector as well as the index vector for our current Voxel.
     ///
-    /// * `chunk` - The Chunk this Voxel resides within.
-    /// * `local_pos` - This Voxel's local position within this Chunk.
-    /// * `world_pos` - This Voxel's *world position*. Necessary to correctly draw the vertices.
-    /// * `start_index` - The current amount of Vertices. Used to set the indices correctly.
-    /// * `world_chunks` - All the chunks inside our world. Used so we can access another Chunk's
+    /// * `chunk`: The Chunk this Voxel resides within.
+    /// * `voxel`: The Voxel itself.
+    /// * `start_index`: The current amount of Vertices. Used to set the indices correctly.
+    /// * `world_chunks`: All the chunks inside our world. Used so we can access another Chunk's
     /// Voxels while we draw in case the neighboring Voxel isn't local to our current Chunk.
     fn create_voxel_data(
         &mut self,
@@ -85,8 +83,9 @@ impl ChunkMesh {
         let wy = voxel.world_position.y as f32;
         let wz = voxel.world_position.z as f32;
 
+
         // Check if there is a solid voxel above
-        if chunk.is_void(IVec3::new(lx, ly + 1, lz), world_chunks) {
+        if chunk.is_void(&voxel.voxel_type, IVec3::new(lx, ly + 1, lz), world_chunks) {
             self.set_indices(vec![0, 3, 1, 1, 3, 2]);
             self.vertices.extend(vec![
                 [wx + -0.5, wy + 0.5, wz + -0.5],
@@ -100,7 +99,7 @@ impl ChunkMesh {
         }
 
         // Check under...
-        if chunk.is_void(IVec3::new(lx, ly - 1, lz), world_chunks) {
+        if chunk.is_void(&voxel.voxel_type, IVec3::new(lx, ly - 1, lz), world_chunks) {
             self.set_indices(vec![0, 1, 3, 1, 2, 3]);
             self.vertices.extend(
                 vec!(
@@ -115,7 +114,7 @@ impl ChunkMesh {
         }
 
         // Right
-        if chunk.is_void(IVec3::new(lx + 1, ly, lz), world_chunks) {
+        if chunk.is_void(&voxel.voxel_type, IVec3::new(lx + 1, ly, lz), world_chunks) {
             self.set_indices(vec![0, 3, 1, 1, 3, 2]);
             self.vertices.extend(
                 vec!(
@@ -131,7 +130,7 @@ impl ChunkMesh {
         }
 
         // Left
-        if chunk.is_void(IVec3::new(lx - 1, ly, lz), world_chunks) {
+        if chunk.is_void(&voxel.voxel_type, IVec3::new(lx - 1, ly, lz), world_chunks) {
             self.set_indices(vec![0, 1, 3, 1, 2, 3]);
             self.vertices.extend(
                 vec!(
@@ -146,7 +145,7 @@ impl ChunkMesh {
         }
 
         // Behind
-        if chunk.is_void(IVec3::new(lx, ly, lz + 1), world_chunks) {
+        if chunk.is_void(&voxel.voxel_type, IVec3::new(lx, ly, lz + 1), world_chunks) {
             self.set_indices(vec![0, 3, 1, 1, 3, 2]);
             self.vertices.extend(
                 vec!(
@@ -161,7 +160,7 @@ impl ChunkMesh {
         }
 
         // In front
-        if chunk.is_void(IVec3::new(lx, ly, lz - 1), world_chunks) {
+        if chunk.is_void(&voxel.voxel_type, IVec3::new(lx, ly, lz - 1), world_chunks) {
             self.set_indices(vec![0, 1, 3, 1, 2, 3]);
             self.vertices.extend(
                 vec!(

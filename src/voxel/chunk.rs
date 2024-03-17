@@ -20,7 +20,7 @@ impl Chunk {
 
     /// Generates this Chunk using noise.
     pub fn generate(&mut self) {
-        let noise = Source::simplex(42069).fbm(
+        let noise = Source::improved_perlin(42069).fbm(
             1, 1.0, 2.0, 0.5,
         );
 
@@ -66,8 +66,17 @@ impl Chunk {
         }
     }
 
+    /// Determines if a position is occupied by something "solid".
+    /// Used to determine which sides of a voxel we render.
+    ///
+    /// * `current_voxel_type`: Some types, such as liquids, are solid but
+    /// should still render blocks next to them under certain conditions.
+    /// * `voxel_pos`: The voxel position we want to check.
+    /// * `world_chunks`: All the chunks in our world. Used when the current
+    /// voxel position is outside its local chunk's bounds.
     pub fn is_void(
         &self,
+        current_voxel_type: &VoxelType,
         voxel_pos: IVec3,
         world_chunks: &HashMap<IVec3, Chunk>
     ) -> bool {
@@ -83,7 +92,14 @@ impl Chunk {
             // Voxel exists inside our chunk. Get the index and check it.
             let idx = voxel_index(x, y, z);
             if let Some(voxel) = self.voxels.get(idx) {
-                return voxel.voxel_type.should_render();
+                // If the current Voxel is liquid, we don't want to render any sides
+                // that are within the body of water itself, so we only check if
+                // the neighbor is air or not.
+                return if current_voxel_type.is_liquid() {
+                    !voxel.voxel_type.is_visible()
+                } else {
+                    voxel.voxel_type.should_render()
+                }
             }
         } else {
             // Voxel exceeds chunk boundaries.
@@ -118,17 +134,20 @@ impl Chunk {
                 neighbor_voxel_pos = IVec3::new(x, y, 31);
             }
 
-            return Chunk::check_neighboring_chunk(neighbor_chunk_idx, neighbor_voxel_pos, world_chunks)
+            return Chunk::check_neighboring_chunk(current_voxel_type, neighbor_chunk_idx, neighbor_voxel_pos, world_chunks)
         }
         true
     }
 
     /// Tries to check the desired Voxel inside a specified Chunk.
     ///
+    /// * `current_voxel_type`: VoxelType of the current voxel.
+    /// Used so we can differentiate against normal solids and "liquids".
     /// * `chunk_idx`: The key for the Chunk we're interested in.
     /// * `voxel_pos`: The local position of the Voxel we're interested in.
     /// * `world_chunks`: All the loaded chunks located in our world.
     fn check_neighboring_chunk(
+        current_voxel_type: &VoxelType,
         chunk_idx: IVec3,
         voxel_pos: IVec3,
         world_chunks: &HashMap<IVec3, Chunk>
@@ -141,12 +160,16 @@ impl Chunk {
                 let voxel_idx = voxel_index(x, y, z);
 
                 if let Some(voxel) = chunk.voxels.get(voxel_idx) {
-                    return !voxel.voxel_type.is_visible();
+                    return if current_voxel_type.is_liquid() {
+                        !voxel.voxel_type.is_visible()
+                    } else {
+                        voxel.voxel_type.should_render()
+                    }
                 }
 
-                true
+                false
             }
-            None => false
+            None => true
         }
     }
 }

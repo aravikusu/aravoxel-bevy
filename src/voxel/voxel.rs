@@ -15,6 +15,10 @@ impl VoxelType {
         *self != VoxelType::AIR
     }
 
+    pub fn is_liquid(&self) -> bool {
+        *self == VoxelType::WATER
+    }
+
     /// Some blocks are technically "visible"
     /// but should still have things render behind them.
     /// Things like WATER, etc.
