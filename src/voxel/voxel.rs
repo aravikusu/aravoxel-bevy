@@ -34,7 +34,7 @@ impl VoxelType {
         match *self {
             VoxelType::STONE => [0.717, 0.710, 0.717, 1.0],
             VoxelType::GRASS => [0.194, 0.840, 0.160, 1.0],
-            VoxelType::WATER => [0.385, 0.610, 0.770, 0.5],
+            VoxelType::WATER => [0.0713, 0.119, 0.310, 0.9],
             _ => [0.0, 0.0, 0.0, 0.0]
         }
     }

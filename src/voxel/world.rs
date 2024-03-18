@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::f32::consts::PI;
+use bevy::pbr::{NotShadowCaster, NotShadowReceiver, TransmittedShadowReceiver};
 use bevy::prelude::*;
 use bevy::render::mesh::{Indices, PrimitiveTopology, VertexAttributeValues};
 use bevy::render::render_asset::RenderAssetUsages;
@@ -46,7 +47,7 @@ fn setup_world(
     mut voxel_world: ResMut<VoxelWorld>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    mut settings: ResMut<Settings>
+    settings: Res<Settings>
 ) {
     for x in 0..9 {
         for y in 0..9 {
@@ -64,13 +65,29 @@ fn setup_world(
         let mut chunk_mesh = ChunkMesh::default();
         chunk_mesh.build_chunk_mesh(&chunk, &voxel_world.chunks, &settings);
 
-        let mesh_handle = meshes.add(setup_bevy_mesh(chunk_mesh));
+        let mesh_handle = meshes.add(setup_bevy_mesh(chunk_mesh.mesh));
 
         commands.spawn(PbrBundle {
             mesh: mesh_handle,
-            material: materials.add(StandardMaterial { ..default() }),
+            material: materials.add(StandardMaterial {
+                ..default()
+            }),
             ..default()
         });
+
+        if !chunk_mesh.liquid_mesh.vertices.is_empty() {
+            let mesh_handle = meshes.add(setup_bevy_mesh(chunk_mesh.liquid_mesh));
+
+            commands.spawn((PbrBundle {
+                mesh: mesh_handle,
+                material: materials.add(StandardMaterial {
+                    alpha_mode: AlphaMode::Blend,
+                    cull_mode: None,
+                    ..default()
+                }),
+                ..default()
+            }, NotShadowReceiver, NotShadowCaster));
+        }
     }
 
     commands.spawn(DirectionalLightBundle {
@@ -88,14 +105,14 @@ fn setup_world(
 
 }
 
-fn setup_bevy_mesh(chunk_mesh: ChunkMesh) -> Mesh {
+fn setup_bevy_mesh(voxel_mesh: crate::voxel::mesh::Mesh) -> Mesh {
     let mut mesh = Mesh::new(PrimitiveTopology::TriangleList, RenderAssetUsages::RENDER_WORLD);
 
-    mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, chunk_mesh.vertices);
-    mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, chunk_mesh.normals);
-    mesh.insert_attribute(Mesh::ATTRIBUTE_COLOR, chunk_mesh.colors);
+    mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, voxel_mesh.vertices);
+    mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, voxel_mesh.normals);
+    mesh.insert_attribute(Mesh::ATTRIBUTE_COLOR, voxel_mesh.colors);
 
-    mesh.insert_indices(Indices::U32(chunk_mesh.indices));
+    mesh.insert_indices(Indices::U32(voxel_mesh.indices));
 
     mesh
 }
