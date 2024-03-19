@@ -1,3 +1,4 @@
+use bevy::math::IVec3;
 use rand::Rng;
 use crate::voxel::voxel::VoxelType;
 
@@ -8,6 +9,7 @@ pub struct Mesh {
     pub normals: Vec<[f32; 3]>,
     pub indices: Vec<u32>,
     pub colors: Vec<[f32; 4]>,
+    pub aos: Vec<u32>,
 }
 
 impl Mesh {
@@ -41,8 +43,14 @@ impl Mesh {
         self.indices.extend(vec);
     }
 
-    pub fn set_normals(&mut self, normals: [f32; 3]) {
-        self.normals.extend([normals; 4]);
+    pub fn set_normals(&mut self, normals: IVec3) {
+        let normal = [
+            normals.x as f32,
+            normals.y as f32,
+            normals.z as f32,
+        ];
+
+        self.normals.extend([normal; 4])
     }
 
     pub fn colorize_vertices(&mut self, voxel_type: &VoxelType) {
@@ -57,6 +65,7 @@ impl Default for Mesh {
             normals: Vec::new(),
             indices: Vec::new(),
             colors: Vec::new(),
+            aos: Vec::new()
         }
     }
 }

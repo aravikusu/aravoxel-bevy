@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use bevy::window::PresentMode;
+use bevy_atmosphere::plugin::AtmospherePlugin;
 use crate::actors::debug_camera::DebugCameraPlugin;
 use crate::global::{GlobalPlugin, KeyBinds, Settings};
 use crate::ui::debug::DebugUIPlugin;
@@ -38,7 +39,8 @@ fn main() {
             GlobalPlugin,
             DebugCameraPlugin,
             VoxelWorldPlugin,
-            DebugUIPlugin
+            DebugUIPlugin,
+            AtmospherePlugin
         ))
         .run();
 }

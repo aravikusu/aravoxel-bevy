@@ -5,7 +5,7 @@ use rand::Rng;
 use crate::global::Settings;
 use crate::voxel::chunk::Chunk;
 use crate::voxel::mesh::Mesh;
-use crate::voxel::util::{CHUNK_SIZE, voxel_index};
+use crate::voxel::util::{CHUNK_SIZE, get_ao, voxel_index};
 use crate::voxel::voxel::{Voxel, VoxelType};
 
 /// The ChunkMesh holds all relevant data for this specific Chunk.
@@ -97,7 +97,9 @@ impl ChunkMesh {
                 [wx + -0.5, wy + 0.5, wz + 0.5],
             ]);
 
-            mesh.set_normals([0.0, 1.0, 0.0]);
+            mesh.set_normals(IVec3::Y);
+            let aos = get_ao(chunk, &voxel.voxel_type, voxel.local_position, IVec3::Y, world_chunks);
+            mesh.aos.extend_from_slice(&aos);
             mesh.colorize_vertices(&voxel.voxel_type);
         }
 
@@ -112,7 +114,9 @@ impl ChunkMesh {
                     [wx + -0.5, wy + -0.5, wz + 0.5],
                 )
             );
-            mesh.set_normals([0.0, -1.0, 0.0]);
+            mesh.set_normals(IVec3::NEG_Y);
+            let aos = get_ao(chunk, &voxel.voxel_type, voxel.local_position, IVec3::NEG_Y, world_chunks);
+            mesh.aos.extend_from_slice(&aos);
             mesh.colorize_vertices(&voxel.voxel_type);
         }
 
@@ -128,7 +132,9 @@ impl ChunkMesh {
                 )
             );
 
-            mesh.set_normals([1.0, 0.0, 0.0]);
+            mesh.set_normals(IVec3::X);
+            let aos = get_ao(chunk, &voxel.voxel_type, voxel.local_position, IVec3::X, world_chunks);
+            mesh.aos.extend_from_slice(&aos);
             mesh.colorize_vertices(&voxel.voxel_type);
         }
 
@@ -143,7 +149,9 @@ impl ChunkMesh {
                     [wx + -0.5, wy + 0.5, wz + -0.5],
                 )
             );
-            mesh.set_normals([-1.0, 0.0, 0.0]);
+            mesh.set_normals(IVec3::X);
+            let aos = get_ao(chunk, &voxel.voxel_type, voxel.local_position, IVec3::X, world_chunks);
+            mesh.aos.extend_from_slice(&aos);
             mesh.colorize_vertices(&voxel.voxel_type);
         }
 
@@ -158,7 +166,9 @@ impl ChunkMesh {
                     [wx + 0.5, wy + -0.5, wz + 0.5],
                 )
             );
-            mesh.set_normals([0.0, 0.0, 1.0]);
+            mesh.set_normals(IVec3::Z);
+            let aos = get_ao(chunk, &voxel.voxel_type,  voxel.local_position, IVec3::Z, world_chunks);
+            mesh.aos.extend_from_slice(&aos);
             mesh.colorize_vertices(&voxel.voxel_type);
         }
 
@@ -174,7 +184,9 @@ impl ChunkMesh {
                 )
             );
 
-            mesh.set_normals([1.0, 0.0, -1.0]);
+            mesh.set_normals(IVec3::NEG_Z);
+            let aos = get_ao(chunk, &voxel.voxel_type, voxel.local_position, IVec3::NEG_Z, world_chunks);
+            mesh.aos.extend_from_slice(&aos);
             mesh.colorize_vertices(&voxel.voxel_type);
         }
     }
