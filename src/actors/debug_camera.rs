@@ -2,6 +2,9 @@ use bevy::ecs::event::ManualEventReader;
 use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
 use bevy::window::{CursorGrabMode, PrimaryWindow};
+use bevy_atmosphere::model::AtmosphereModel;
+use bevy_atmosphere::plugin::AtmosphereCamera;
+use bevy_atmosphere::prelude::Nishita;
 use crate::global::KeyBinds;
 
 /// A plugin for the Debug Camera.
@@ -47,6 +50,15 @@ fn spawn_debug_camera(mut commands: Commands) {
             ..default()
         },
         DebugCamera,
+        AtmosphereCamera::default(),
+        FogSettings {
+            color: Color::hex("#c2b797").unwrap(),
+            falloff: FogFalloff::Linear {
+                start: 80.0,
+                end: 200.0
+            },
+            ..default()
+        }
     ));
 }
 

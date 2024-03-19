@@ -9,6 +9,7 @@ edition = "2021"
 bevy_egui = "0.25.0"
 libnoise = "1.1.2"
 rand = "0.8.1"
+bevy_atmosphere = "0.9.0"
 
 
 [dependencies.bevy]
