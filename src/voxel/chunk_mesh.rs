@@ -89,7 +89,14 @@ impl ChunkMesh {
 
         // Check if there is a solid voxel above
         if chunk.is_void(&voxel.voxel_type, IVec3::new(lx, ly + 1, lz), world_chunks) {
-            mesh.set_indices(vec![0, 3, 2, 0, 2, 1]);
+            let aos = get_ao(chunk, &voxel.voxel_type, IVec3::new(lx, ly + 1, lz), IVec3::Y, world_chunks);
+            // Fixing aos by flipping if needed
+            if aos[1] + aos[3] > aos[0] + aos[2] {
+                mesh.set_indices(vec![1, 0, 3, 1, 3, 2]);
+            } else {
+                mesh.set_indices(vec![0, 3, 2, 0, 2, 1]);
+            }
+
             mesh.set_vertices(vec![
                 [wx, wy + 1.0, wz],
                 [wx + 1.0, wy + 1.0, wz],
@@ -98,14 +105,19 @@ impl ChunkMesh {
             ]);
 
             mesh.set_normals(IVec3::Y);
-            let aos = get_ao(chunk, &voxel.voxel_type, IVec3::new(lx, ly + 1, lz), IVec3::Y, world_chunks);
             mesh.aos.extend_from_slice(&aos);
             mesh.colorize_vertices(&voxel.voxel_type);
         }
 
         // Check under...
         if chunk.is_void(&voxel.voxel_type, IVec3::new(lx, ly - 1, lz), world_chunks) {
-            mesh.set_indices(vec![0, 2, 3, 0, 1, 2]);
+            let aos = get_ao(chunk, &voxel.voxel_type, IVec3::new(lx, ly - 1, lz), IVec3::Y, world_chunks);
+            if aos[1] + aos[3] > aos[0] + aos[2] {
+                mesh.set_indices(vec![1, 3, 0, 1, 2, 3]);
+            } else {
+                mesh.set_indices(vec![0, 2, 3, 0, 1, 2]);
+            }
+
             mesh.set_vertices(
                 vec!(
                     [wx, wy, wz],
@@ -115,14 +127,19 @@ impl ChunkMesh {
                 )
             );
             mesh.set_normals(IVec3::NEG_Y);
-            let aos = get_ao(chunk, &voxel.voxel_type, IVec3::new(lx, ly - 1, lz), IVec3::Y, world_chunks);
             mesh.aos.extend_from_slice(&aos);
             mesh.colorize_vertices(&voxel.voxel_type);
         }
 
         // Right
         if chunk.is_void(&voxel.voxel_type, IVec3::new(lx + 1, ly, lz), world_chunks) {
-            mesh.set_indices(vec![0, 1, 2, 0, 2, 3]);
+            let aos = get_ao(chunk, &voxel.voxel_type, IVec3::new(lx + 1, ly, lz), IVec3::X, world_chunks);
+            if aos[1] + aos[3] > aos[0] + aos[2] {
+                mesh.set_indices(vec![3, 0, 1, 3, 1, 2]);
+            } else {
+                mesh.set_indices(vec![0, 1, 2, 0, 2, 3]);
+            }
+
             mesh.set_vertices(
                 vec!(
                     [wx + 1.0, wy, wz],
@@ -133,14 +150,19 @@ impl ChunkMesh {
             );
 
             mesh.set_normals(IVec3::X);
-            let aos = get_ao(chunk, &voxel.voxel_type, IVec3::new(lx + 1, ly, lz), IVec3::X, world_chunks);
             mesh.aos.extend_from_slice(&aos);
             mesh.colorize_vertices(&voxel.voxel_type);
         }
 
         // Left
         if chunk.is_void(&voxel.voxel_type, IVec3::new(lx - 1, ly, lz), world_chunks) {
-            mesh.set_indices(vec![0, 2, 1, 0, 3, 2]);
+            let aos = get_ao(chunk, &voxel.voxel_type, IVec3::new(lx - 1, ly, lz), IVec3::X, world_chunks);
+            if aos[1] + aos[3] > aos[0] + aos[2] {
+                mesh.set_indices(vec![3, 1, 0, 3, 2, 1]);
+            } else {
+                mesh.set_indices(vec![0, 2, 1, 0, 3, 2]);
+            }
+
             mesh.set_vertices(
                 vec!(
                     [wx, wy, wz],
@@ -150,14 +172,19 @@ impl ChunkMesh {
                 )
             );
             mesh.set_normals(IVec3::X);
-            let aos = get_ao(chunk, &voxel.voxel_type, IVec3::new(lx - 1, ly, lz), IVec3::X, world_chunks);
             mesh.aos.extend_from_slice(&aos);
             mesh.colorize_vertices(&voxel.voxel_type);
         }
 
         // Behind
         if chunk.is_void(&voxel.voxel_type, IVec3::new(lx, ly, lz - 1), world_chunks) {
-            mesh.set_indices(vec![0, 1, 2, 0, 2, 3]);
+            let aos = get_ao(chunk, &voxel.voxel_type,  IVec3::new(lx, ly, lz - 1), IVec3::Z, world_chunks);
+            if aos[1] + aos[3] > aos[0] + aos[2] {
+                mesh.set_indices(vec![3, 0, 1, 3, 1, 2]);
+            } else {
+                mesh.set_indices(vec![0, 1, 2, 0, 2, 3]);
+            }
+
             mesh.set_vertices(
                 vec!(
                     [wx, wy, wz],
@@ -167,13 +194,19 @@ impl ChunkMesh {
                 )
             );
             mesh.set_normals(IVec3::Z);
-            let aos = get_ao(chunk, &voxel.voxel_type,  IVec3::new(lx, ly, lz - 1), IVec3::Z, world_chunks);
             mesh.aos.extend_from_slice(&aos);
             mesh.colorize_vertices(&voxel.voxel_type);
         }
 
         // In front
         if chunk.is_void(&voxel.voxel_type, IVec3::new(lx, ly, lz + 1), world_chunks) {
+            let aos = get_ao(chunk, &voxel.voxel_type, IVec3::new(lx, ly, lz + 1), IVec3::Z, world_chunks);
+            if aos[1] + aos[3] > aos[0] + aos[2] {
+                mesh.set_indices(vec![3, 1, 0, 3, 2, 1]);
+            } else {
+                mesh.set_indices(vec![0, 2, 1, 0, 3, 2]);
+            }
+
             mesh.set_indices(vec![0, 2, 1, 0, 3, 2]);
             mesh.set_vertices(
                 vec!(
@@ -185,7 +218,6 @@ impl ChunkMesh {
             );
 
             mesh.set_normals(IVec3::NEG_Z);
-            let aos = get_ao(chunk, &voxel.voxel_type, IVec3::new(lx, ly, lz + 1), IVec3::Z, world_chunks);
             mesh.aos.extend_from_slice(&aos);
             mesh.colorize_vertices(&voxel.voxel_type);
         }
