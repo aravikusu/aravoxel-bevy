@@ -23,70 +23,38 @@ pub fn get_ao(
     plane: IVec3,
     world_chunks: &HashMap<IVec3, Chunk>
 ) -> [u32; 4] {
-    let x = origin_pos.x;
-    let y = origin_pos.y;
-    let z = origin_pos.z;
+    let IVec3 { x, y, z} = origin_pos;
 
     match plane {
-        IVec3::NEG_X => side_ao([
-            !chunk.is_void(current_voxel_type, IVec3::new(x - 1, y, z - 1), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x - 1, y - 1, z - 1), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x - 1, y - 1, z), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x - 1, y - 1, z + 1), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x - 1, y, z + 1), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x - 1, y + 1, z + 1), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x - 1, y + 1, z), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x - 1, y + 1, z - 1), world_chunks)
-        ]),
         IVec3::X => side_ao([
-            !chunk.is_void(current_voxel_type, IVec3::new(x + 1, y, z - 1), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x + 1, y - 1, z - 1), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x + 1, y - 1, z), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x + 1, y - 1, z + 1), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x + 1, y, z + 1), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x + 1, y + 1, z + 1), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x + 1, y + 1, z), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x + 1, y + 1, z - 1), world_chunks)
-        ]),
-        IVec3::NEG_Y => side_ao([
+            !chunk.is_void(current_voxel_type, IVec3::new(x, y, z - 1), world_chunks),
             !chunk.is_void(current_voxel_type, IVec3::new(x, y - 1, z - 1), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x - 1, y - 1, z - 1), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x - 1, y - 1, z), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x - 1, y - 1, z + 1), world_chunks),
+            !chunk.is_void(current_voxel_type, IVec3::new(x, y - 1, z), world_chunks),
             !chunk.is_void(current_voxel_type, IVec3::new(x, y - 1, z + 1), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x + 1, y - 1, z + 1), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x + 1, y - 1, z), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x + 1, y - 1, z - 1), world_chunks)
+            !chunk.is_void(current_voxel_type, IVec3::new(x, y, z + 1), world_chunks),
+            !chunk.is_void(current_voxel_type, IVec3::new(x, y + 1, z + 1), world_chunks),
+            !chunk.is_void(current_voxel_type, IVec3::new(x, y + 1, z), world_chunks),
+            !chunk.is_void(current_voxel_type, IVec3::new(x, y + 1, z - 1), world_chunks)
         ]),
         IVec3::Y => side_ao([
-            !chunk.is_void(current_voxel_type, IVec3::new(x, y + 1, z - 1), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x - 1, y + 1, z - 1), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x - 1, y + 1, z), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x - 1, y + 1, z + 1), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x, y + 1, z + 1), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x + 1, y + 1, z + 1), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x + 1, y + 1, z), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x + 1, y + 1, z - 1), world_chunks)
-        ]),
-        IVec3::NEG_Z => side_ao([
+            !chunk.is_void(current_voxel_type, IVec3::new(x, y, z - 1), world_chunks),
             !chunk.is_void(current_voxel_type, IVec3::new(x - 1, y, z - 1), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x - 1, y - 1, z - 1), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x, y - 1, z - 1), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x + 1, y - 1, z - 1), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x + 1, y, z - 1), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x + 1, y + 1, z - 1), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x, y + 1, z - 1), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x - 1, y + 1, z - 1), world_chunks)
+            !chunk.is_void(current_voxel_type, IVec3::new(x - 1, y, z), world_chunks),
+            !chunk.is_void(current_voxel_type, IVec3::new(x - 1, y, z + 1), world_chunks),
+            !chunk.is_void(current_voxel_type, IVec3::new(x, y, z + 1), world_chunks),
+            !chunk.is_void(current_voxel_type, IVec3::new(x + 1, y, z + 1), world_chunks),
+            !chunk.is_void(current_voxel_type, IVec3::new(x + 1, y, z), world_chunks),
+            !chunk.is_void(current_voxel_type, IVec3::new(x + 1, y, z - 1), world_chunks)
         ]),
         IVec3::Z => side_ao([
-            !chunk.is_void(current_voxel_type, IVec3::new(x - 1, y, z + 1), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x - 1, y - 1, z + 1), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x, y - 1, z + 1), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x + 1, y - 1, z + 1), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x + 1, y, z + 1), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x + 1, y + 1, z + 1), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x, y + 1, z + 1), world_chunks),
-            !chunk.is_void(current_voxel_type, IVec3::new(x - 1, y + 1, z + 1), world_chunks)
+            !chunk.is_void(current_voxel_type, IVec3::new(x - 1, y, z), world_chunks),
+            !chunk.is_void(current_voxel_type, IVec3::new(x - 1, y - 1, z), world_chunks),
+            !chunk.is_void(current_voxel_type, IVec3::new(x, y - 1, z), world_chunks),
+            !chunk.is_void(current_voxel_type, IVec3::new(x + 1, y - 1, z), world_chunks),
+            !chunk.is_void(current_voxel_type, IVec3::new(x + 1, y, z), world_chunks),
+            !chunk.is_void(current_voxel_type, IVec3::new(x + 1, y + 1, z), world_chunks),
+            !chunk.is_void(current_voxel_type, IVec3::new(x, y + 1, z), world_chunks),
+            !chunk.is_void(current_voxel_type, IVec3::new(x - 1, y + 1, z), world_chunks)
         ]),
         _ => unreachable!()
     }
