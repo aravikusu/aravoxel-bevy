@@ -78,7 +78,7 @@ impl Chunk {
         &self,
         current_voxel_type: &VoxelType,
         voxel_pos: IVec3,
-        world_chunks: &HashMap<IVec3, Chunk>
+        world_chunks: &HashMap<IVec3, Chunk>,
     ) -> bool {
         let x = voxel_pos.x;
         let y = voxel_pos.y;
@@ -99,42 +99,41 @@ impl Chunk {
                     !voxel.voxel_type.is_visible()
                 } else {
                     voxel.voxel_type.should_render()
-                }
+                };
             }
         } else {
             // Voxel exceeds chunk boundaries.
             // We need to know check the neighboring Chunk's voxel
             // to find out if we should draw or not.
-            // FIXME: Probably refactor, this isn't great...
 
             let c_pos = self.position;
-            let mut neighbor_chunk_idx = IVec3::ZERO;
-            let mut neighbor_voxel_pos = IVec3::ZERO;
+            let mut neighbor_chunk_idx = IVec3::new(c_pos.x, c_pos.y, c_pos.z);
+            let mut neighbor_voxel_pos = IVec3::new(x, y, z);
             if x > (CHUNK_SIZE - 1) {
-                neighbor_chunk_idx = IVec3::new(c_pos.x + 1, c_pos.y, c_pos.z);
-                neighbor_voxel_pos = IVec3::new(0, y, z);
+                neighbor_chunk_idx.x += 1;
+                neighbor_voxel_pos.x = 0
             } else if x < 0 {
-                neighbor_chunk_idx = IVec3::new(c_pos.x - 1, c_pos.y, c_pos.z);
-                neighbor_voxel_pos = IVec3::new(31, y, z);
+                neighbor_chunk_idx.x -= 1;
+                neighbor_voxel_pos.x = 31;
             }
 
             if y > (CHUNK_SIZE - 1) {
-                neighbor_chunk_idx = IVec3::new(c_pos.x, c_pos.y + 1, c_pos.z);
-                neighbor_voxel_pos = IVec3::new(x, 0, z);
+                neighbor_chunk_idx.y += 1;
+                neighbor_voxel_pos.y = 0;
             } else if y < 0 {
-                neighbor_chunk_idx = IVec3::new(c_pos.x, c_pos.y - 1, c_pos.z);
-                neighbor_voxel_pos = IVec3::new(x, 31, z);
+                neighbor_chunk_idx.y -= 1;
+                neighbor_voxel_pos.y = 31;
             }
 
             if z > (CHUNK_SIZE - 1) {
-                neighbor_chunk_idx = IVec3::new(c_pos.x, c_pos.y, c_pos.z + 1);
-                neighbor_voxel_pos = IVec3::new(x, y, 0);
+                neighbor_chunk_idx.z += 1;
+                neighbor_voxel_pos.z = 0;
             } else if z < 0 {
-                neighbor_chunk_idx = IVec3::new(c_pos.x, c_pos.y, c_pos.z - 1);
-                neighbor_voxel_pos = IVec3::new(x, y, 31);
+                neighbor_chunk_idx.z -= 1;
+                neighbor_voxel_pos.z = 31;
             }
 
-            return Chunk::check_neighboring_chunk(current_voxel_type, neighbor_chunk_idx, neighbor_voxel_pos, world_chunks)
+            return Chunk::check_neighboring_chunk(current_voxel_type, neighbor_chunk_idx, neighbor_voxel_pos, world_chunks);
         }
         true
     }
@@ -150,7 +149,7 @@ impl Chunk {
         current_voxel_type: &VoxelType,
         chunk_idx: IVec3,
         voxel_pos: IVec3,
-        world_chunks: &HashMap<IVec3, Chunk>
+        world_chunks: &HashMap<IVec3, Chunk>,
     ) -> bool {
         let x = voxel_pos.x;
         let y = voxel_pos.y;
@@ -164,7 +163,7 @@ impl Chunk {
                         !voxel.voxel_type.is_visible()
                     } else {
                         voxel.voxel_type.should_render()
-                    }
+                    };
                 }
 
                 false
