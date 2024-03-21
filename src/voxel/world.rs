@@ -94,15 +94,9 @@ fn setup_world(
         }
     }
 
-    commands.spawn(DirectionalLightBundle {
-       directional_light: DirectionalLight {
-           color: Color::rgb(0.98, 0.95, 0.82),
-           shadows_enabled: true,
-           ..default()
-       },
-       transform: Transform::from_xyz(0.0, 0.0, 0.0)
-           .looking_at(Vec3::new(-0.15, -5.05, 0.25), Vec3::Y),
-       ..default()
+    commands.insert_resource(AmbientLight {
+        color: Color::rgb(0.98, 0.95, 0.82),
+        brightness: 1000.0,
     });
 
 
