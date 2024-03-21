@@ -50,15 +50,15 @@ fn spawn_debug_camera(mut commands: Commands) {
             ..default()
         },
         DebugCamera,
-        AtmosphereCamera::default(),
-        FogSettings {
-            color: Color::hex("#c2b797").unwrap(),
-            falloff: FogFalloff::Linear {
-                start: 80.0,
-                end: 200.0
-            },
-            ..default()
-        }
+        //AtmosphereCamera::default(),
+        // FogSettings {
+        //     color: Color::hex("#c2b797").unwrap(),
+        //     falloff: FogFalloff::Linear {
+        //         start: 80.0,
+        //         end: 200.0
+        //     },
+        //     ..default()
+        // }
     ));
 }
 

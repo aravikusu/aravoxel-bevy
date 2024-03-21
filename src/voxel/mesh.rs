@@ -9,6 +9,7 @@ pub struct Mesh {
     pub normals: Vec<[f32; 3]>,
     pub indices: Vec<u32>,
     pub colors: Vec<[f32; 4]>,
+    pub uvs: Vec<[f32; 2]>,
     pub aos: Vec<u32>,
 }
 
@@ -53,8 +54,21 @@ impl Mesh {
         self.normals.extend([normal; 4])
     }
 
-    pub fn colorize_vertices(&mut self, voxel_type: &VoxelType) {
-        self.colors.extend([voxel_type.type_to_color(); 4]);
+    pub fn set_uvs(&mut self, voxel_type: &VoxelType) {
+        self.uvs.extend(voxel_type.type_to_uvs());
+    }
+
+    pub fn add_ao_color(&mut self, alpha: f32) {
+        self.colors = self.vertices
+            .iter()
+            .enumerate()
+            .map(|(i, _)| match self.aos[i] {
+                0 => [0.1, 0.1, 0.1, alpha],
+                1 => [0.3, 0.3, 0.3, alpha],
+                2 => [0.5, 0.5, 0.5, alpha],
+                3 => [1.0, 1.0, 1.0, alpha],
+                _ => [1.0, 1.0, 1.0, alpha],
+            }).collect();
     }
 }
 
@@ -65,6 +79,7 @@ impl Default for Mesh {
             normals: Vec::new(),
             indices: Vec::new(),
             colors: Vec::new(),
+            uvs: Vec::new(),
             aos: Vec::new()
         }
     }

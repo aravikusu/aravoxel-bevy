@@ -51,6 +51,10 @@ impl ChunkMesh {
             }
         }
 
+        // Add all the AO once the generation is done
+        self.mesh.add_ao_color(1.0);
+        self.liquid_mesh.add_ao_color(0.3);
+
         if settings.clown_vomit {
             self.mesh.clown_vomit();
             self.liquid_mesh.clown_vomit();
@@ -106,7 +110,7 @@ impl ChunkMesh {
 
             mesh.set_normals(IVec3::Y);
             mesh.aos.extend_from_slice(&aos);
-            mesh.colorize_vertices(&voxel.voxel_type);
+            mesh.set_uvs(&voxel.voxel_type);
         }
 
         // Check under...
@@ -128,7 +132,7 @@ impl ChunkMesh {
             );
             mesh.set_normals(IVec3::NEG_Y);
             mesh.aos.extend_from_slice(&aos);
-            mesh.colorize_vertices(&voxel.voxel_type);
+            mesh.set_uvs(&voxel.voxel_type);
         }
 
         // Right
@@ -151,7 +155,7 @@ impl ChunkMesh {
 
             mesh.set_normals(IVec3::X);
             mesh.aos.extend_from_slice(&aos);
-            mesh.colorize_vertices(&voxel.voxel_type);
+            mesh.set_uvs(&voxel.voxel_type);
         }
 
         // Left
@@ -171,9 +175,9 @@ impl ChunkMesh {
                     [wx, wy, wz + 1.0],
                 )
             );
-            mesh.set_normals(IVec3::X);
+            mesh.set_normals(IVec3::NEG_X);
             mesh.aos.extend_from_slice(&aos);
-            mesh.colorize_vertices(&voxel.voxel_type);
+            mesh.set_uvs(&voxel.voxel_type);
         }
 
         // Behind
@@ -193,9 +197,9 @@ impl ChunkMesh {
                     [wx + 1.0, wy, wz],
                 )
             );
-            mesh.set_normals(IVec3::Z);
+            mesh.set_normals(IVec3::NEG_Z);
             mesh.aos.extend_from_slice(&aos);
-            mesh.colorize_vertices(&voxel.voxel_type);
+            mesh.set_uvs(&voxel.voxel_type);
         }
 
         // In front
@@ -217,9 +221,9 @@ impl ChunkMesh {
                 )
             );
 
-            mesh.set_normals(IVec3::NEG_Z);
+            mesh.set_normals(IVec3::Z);
             mesh.aos.extend_from_slice(&aos);
-            mesh.colorize_vertices(&voxel.voxel_type);
+            mesh.set_uvs(&voxel.voxel_type);
         }
     }
 }

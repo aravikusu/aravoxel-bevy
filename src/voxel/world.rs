@@ -44,6 +44,7 @@ impl Plugin for VoxelWorldPlugin {
 
 fn setup_world(
     mut commands: Commands,
+    asset_server: Res<AssetServer>,
     mut voxel_world: ResMut<VoxelWorld>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
@@ -61,27 +62,30 @@ fn setup_world(
         }
     }
 
+    let texture: Handle<Image> = asset_server.load("voxel_atlas.png");
     for (_chunk_pos, chunk) in &voxel_world.chunks {
         let mut chunk_mesh = ChunkMesh::default();
         chunk_mesh.build_chunk_mesh(&chunk, &voxel_world.chunks, &settings);
 
-        let mesh_handle = meshes.add(setup_bevy_mesh(chunk_mesh.mesh));
+        let mesh_handle = meshes.add(setup_bevy_mesh(chunk_mesh.mesh, false));
 
         commands.spawn(PbrBundle {
             mesh: mesh_handle,
             material: materials.add(StandardMaterial {
+                base_color_texture: Some(texture.clone()),
                 ..default()
             }),
             ..default()
         });
 
         if !chunk_mesh.liquid_mesh.vertices.is_empty() {
-            let mesh_handle = meshes.add(setup_bevy_mesh(chunk_mesh.liquid_mesh));
+            let mesh_handle = meshes.add(setup_bevy_mesh(chunk_mesh.liquid_mesh, true));
 
             commands.spawn((PbrBundle {
                 mesh: mesh_handle,
                 material: materials.add(StandardMaterial {
-                    alpha_mode: AlphaMode::Blend,
+                    base_color_texture: Some(texture.clone()),
+                    alpha_mode: AlphaMode::Add,
                     cull_mode: None,
                     ..default()
                 }),
@@ -90,39 +94,27 @@ fn setup_world(
         }
     }
 
-    //commands.spawn(DirectionalLightBundle {
-    //    directional_light: DirectionalLight {
-    //        color: Color::rgb(0.98, 0.95, 0.82),
-    //        shadows_enabled: true,
-    //        ..default()
-    //    },
-    //    transform: Transform::from_xyz(0.0, 0.0, 0.0)
-    //        .looking_at(Vec3::new(-0.15, -5.05, 0.25), Vec3::Y),
-    //    ..default()
-    //});
+    commands.spawn(DirectionalLightBundle {
+       directional_light: DirectionalLight {
+           color: Color::rgb(0.98, 0.95, 0.82),
+           shadows_enabled: true,
+           ..default()
+       },
+       transform: Transform::from_xyz(0.0, 0.0, 0.0)
+           .looking_at(Vec3::new(-0.15, -5.05, 0.25), Vec3::Y),
+       ..default()
+    });
 
 
 }
 
-fn setup_bevy_mesh(voxel_mesh: crate::voxel::mesh::Mesh) -> Mesh {
+fn setup_bevy_mesh(voxel_mesh: crate::voxel::mesh::Mesh, liquid: bool) -> Mesh {
     let mut mesh = Mesh::new(PrimitiveTopology::TriangleList, RenderAssetUsages::RENDER_WORLD);
 
     mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, voxel_mesh.vertices.clone());
     mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, voxel_mesh.normals);
-
-    {
-        let colors: Vec<[f32; 4]> = voxel_mesh.vertices
-            .iter()
-            .enumerate()
-            .map(|(i, _)| match voxel_mesh.aos[i] {
-                0 => [0.1, 0.1, 0.1, 1.0],
-                1 => [0.3, 0.3, 0.3, 1.0],
-                2 => [0.5, 0.5, 0.5, 1.0],
-                3 => [1.0, 1.0, 1.0, 1.0],
-                _ => [1.0, 1.0, 1.0, 1.0],
-            }).collect();
-        mesh.insert_attribute(Mesh::ATTRIBUTE_COLOR, colors);
-    }
+    mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, voxel_mesh.uvs);
+    mesh.insert_attribute(Mesh::ATTRIBUTE_COLOR, voxel_mesh.colors);
 
     mesh.insert_indices(Indices::U32(voxel_mesh.indices));
 

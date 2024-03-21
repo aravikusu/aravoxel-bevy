@@ -30,12 +30,12 @@ impl VoxelType {
         }
     }
 
-    pub fn type_to_color(&self) -> [f32; 4] {
+    pub fn type_to_uvs(&self) -> Vec<[f32; 2]> {
         match *self {
-            VoxelType::STONE => [0.717, 0.710, 0.717, 1.0],
-            VoxelType::GRASS => [0.194, 0.840, 0.160, 1.0],
-            VoxelType::WATER => [0.0713, 0.119, 0.310, 0.9],
-            _ => [0.0, 0.0, 0.0, 0.0]
+            VoxelType::GRASS => vec![[0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0]],
+            VoxelType::STONE => vec![[0.1, 0.0], [0.1, 0.0], [0.1, 0.0], [0.1, 0.0]],
+            VoxelType::WATER => vec![[0.2, 0.0], [0.2, 0.0], [0.2, 0.0], [0.2, 0.0]],
+            _ => unreachable!()
         }
     }
 }
