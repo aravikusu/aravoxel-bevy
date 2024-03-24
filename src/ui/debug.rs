@@ -31,7 +31,7 @@ fn debug_ui(
             fps = fps_smooth;
         }
     }
-    egui::Window::new("Debug Menu").show(contexts.ctx_mut(), |ui| {
+    egui::Window::new("aravoxel Debug Menu").show(contexts.ctx_mut(), |ui| {
         ui.heading("Player");
         ui.collapsing("Player Info", |ui| {
             ui.collapsing("Position", |ui| {

@@ -4,18 +4,19 @@ use bevy_atmosphere::plugin::AtmospherePlugin;
 use crate::actors::debug_camera::DebugCameraPlugin;
 use crate::global::{GlobalPlugin, KeyBinds, Settings};
 use crate::ui::debug::DebugUIPlugin;
-use crate::voxel::world::VoxelWorldPlugin;
+use crate::voxel::plugin::VoxelWorldPlugin;
 
 mod actors;
 mod global;
 mod voxel;
 mod ui;
+mod worldgen;
 
 fn main() {
     App::new()
         .insert_resource(KeyBinds::default())
         .insert_resource(Settings::default())
-        .add_plugins((
+        .add_plugins(
             DefaultPlugins.set(WindowPlugin {
                 primary_window: Some(Window {
                     title: "aravoxel".into(),
@@ -34,7 +35,7 @@ fn main() {
                 }),
                 ..default()
             })
-        ))
+        )
         .add_plugins((
             GlobalPlugin,
             DebugCameraPlugin,

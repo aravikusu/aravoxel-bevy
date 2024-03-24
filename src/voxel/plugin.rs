@@ -1,35 +1,10 @@
-use std::collections::HashMap;
 use bevy::pbr::{NotShadowCaster, NotShadowReceiver};
 use bevy::prelude::*;
 use bevy::render::mesh::{Indices, PrimitiveTopology};
 use bevy::render::render_asset::RenderAssetUsages;
-use bevy_atmosphere::prelude::*;
 use crate::global::Settings;
-use crate::voxel::chunk::Chunk;
 use crate::voxel::chunk_mesh::ChunkMesh;
-
-#[derive(Resource)]
-pub struct VoxelWorld {
-    chunks: HashMap<IVec3, Chunk>,
-    //meshes: HashMap<IVec3, ChunkMesh>
-}
-
-impl Default for VoxelWorld {
-    fn default() -> Self {
-        Self {
-            chunks: HashMap::new(),
-            //meshes: HashMap::new(),
-        }
-    }
-}
-
-impl VoxelWorld {
-    pub fn insert_chunk(&mut self, position: IVec3, chunk: Chunk) -> &Chunk {
-        self.chunks.insert(position, chunk);
-
-        self.chunks.get(&position).unwrap()
-    }
-}
+use crate::worldgen::world::VoxelWorld;
 
 /// Handles the logic and all the fun things relating
 /// to our voxel world.
@@ -51,13 +26,10 @@ fn setup_world(
     settings: Res<Settings>
 ) {
     for x in 0..9 {
-        for y in 0..9 {
+        for y in -2..9 {
             for z in 0..9 {
                 let chunk_pos = IVec3::new(x, y, z);
-                let mut chunk = Chunk::new(chunk_pos);
-                chunk.generate();
-
-                voxel_world.chunks.insert(chunk_pos, chunk.clone());
+                voxel_world.generate_chunk(chunk_pos);
             }
         }
     }
@@ -67,7 +39,7 @@ fn setup_world(
         let mut chunk_mesh = ChunkMesh::default();
         chunk_mesh.build_chunk_mesh(&chunk, &voxel_world.chunks, &settings);
 
-        let mesh_handle = meshes.add(setup_bevy_mesh(chunk_mesh.mesh, false));
+        let mesh_handle = meshes.add(setup_bevy_mesh(chunk_mesh.mesh));
 
         commands.spawn(PbrBundle {
             mesh: mesh_handle,
@@ -79,7 +51,7 @@ fn setup_world(
         });
 
         if !chunk_mesh.liquid_mesh.vertices.is_empty() {
-            let mesh_handle = meshes.add(setup_bevy_mesh(chunk_mesh.liquid_mesh, true));
+            let mesh_handle = meshes.add(setup_bevy_mesh(chunk_mesh.liquid_mesh));
 
             commands.spawn((PbrBundle {
                 mesh: mesh_handle,
@@ -98,11 +70,9 @@ fn setup_world(
         color: Color::rgb(0.98, 0.95, 0.82),
         brightness: 1000.0,
     });
-
-
 }
 
-fn setup_bevy_mesh(voxel_mesh: crate::voxel::mesh::Mesh, liquid: bool) -> Mesh {
+fn setup_bevy_mesh(voxel_mesh: crate::voxel::mesh::Mesh) -> Mesh {
     let mut mesh = Mesh::new(PrimitiveTopology::TriangleList, RenderAssetUsages::RENDER_WORLD);
 
     mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, voxel_mesh.vertices.clone());

@@ -4,6 +4,7 @@ use crate::voxel::chunk::Chunk;
 use crate::voxel::voxel::VoxelType;
 
 pub const CHUNK_SIZE: i32 = 32;
+#[allow(dead_code)]
 pub const CHUNK_SIZE_F32: f32 = CHUNK_SIZE as f32;
 pub const CHUNK_AREA: i32 = CHUNK_SIZE * CHUNK_SIZE;
 pub const CHUNK_VOL: i32 = CHUNK_AREA * CHUNK_SIZE;
@@ -60,18 +61,19 @@ pub fn get_ao(
     }
 }
 
+/// Checks the 4 relevant corners in order to get the right AO.
+/// Since we draw the sides of our voxels in the exact same order,
+/// this will always be static.
 fn side_ao(neighbours: [bool; 8]) -> [u32; 4] {
     [
-        //ao_value(neighbours[0], neighbours[1], neighbours[2]),
-        //ao_value(neighbours[2], neighbours[3], neighbours[4]),
-        //ao_value(neighbours[6], neighbours[7], neighbours[0]),
-        //ao_value(neighbours[4], neighbours[5], neighbours[6]),
         ao_value(neighbours[0], neighbours[1], neighbours[2]),
         ao_value(neighbours[6], neighbours[7], neighbours[0]),
         ao_value(neighbours[4], neighbours[5], neighbours[6]),
         ao_value(neighbours[2], neighbours[3], neighbours[4]),
     ]
 }
+
+/// Retrieves the AO value.
 fn ao_value(side1: bool, corner: bool, side2: bool) -> u32 {
     match (side1, corner, side2) {
         (true, _, true) => 0,

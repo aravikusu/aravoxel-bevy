@@ -1,12 +1,11 @@
 use std::collections::HashMap;
 use bevy::math::IVec3;
 use bevy::prelude::{Res};
-use rand::Rng;
 use crate::global::Settings;
 use crate::voxel::chunk::Chunk;
 use crate::voxel::mesh::Mesh;
 use crate::voxel::util::{CHUNK_SIZE, get_ao, voxel_index};
-use crate::voxel::voxel::{Voxel, VoxelType};
+use crate::voxel::voxel::{Voxel};
 
 /// The ChunkMesh holds all relevant data for this specific Chunk.
 pub struct ChunkMesh {
@@ -84,7 +83,7 @@ impl ChunkMesh {
         let wz = voxel.world_position.z as f32;
 
         // Determine if this should go to the liquid mesh or normal one
-        let mut mesh = if voxel.voxel_type.is_liquid() {
+        let mesh = if voxel.voxel_type.is_liquid() {
             &mut self.liquid_mesh
         } else {
             &mut self.mesh

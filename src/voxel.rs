@@ -1,6 +1,6 @@
-pub mod world;
+pub mod plugin;
 pub mod util;
 pub mod chunk;
-mod voxel;
+pub(crate) mod voxel;
 mod chunk_mesh;
 mod mesh;
