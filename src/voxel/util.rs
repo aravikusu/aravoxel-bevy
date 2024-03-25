@@ -6,6 +6,7 @@ use crate::voxel::voxel::VoxelType;
 pub const CHUNK_SIZE: i32 = 32;
 #[allow(dead_code)]
 pub const CHUNK_SIZE_F32: f32 = CHUNK_SIZE as f32;
+pub const CHUNK_SIZE_F64: f64 = CHUNK_SIZE as f64;
 pub const CHUNK_AREA: i32 = CHUNK_SIZE * CHUNK_SIZE;
 pub const CHUNK_VOL: i32 = CHUNK_AREA * CHUNK_SIZE;
 

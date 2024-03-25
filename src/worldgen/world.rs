@@ -1,13 +1,16 @@
 use std::collections::HashMap;
 use bevy::prelude::*;
 use noise::{Fbm, MultiFractal, NoiseFn, Perlin};
+use splines::Spline;
 use crate::voxel::chunk::Chunk;
-use crate::voxel::util::{CHUNK_SIZE, voxel_index};
+use crate::voxel::util::{CHUNK_SIZE, CHUNK_SIZE_F64, voxel_index};
 use crate::voxel::voxel::VoxelType;
 
 #[derive(Resource)]
 pub struct VoxelWorld {
-    pub world_noise: Fbm::<Perlin>,
+    pub world_noise: Fbm<Perlin>,
+    pub verticality: Perlin,
+    pub spline_points: Spline<f64, f64>,
     pub chunks: HashMap<IVec3, Chunk>,
     //meshes: HashMap<IVec3, ChunkMesh>
 }
@@ -16,6 +19,16 @@ impl Default for VoxelWorld {
     fn default() -> Self {
         Self {
             world_noise: Fbm::<Perlin>::new(42069).set_octaves(6),
+            verticality: Perlin::new(42069),
+            spline_points: Spline::from_vec(vec![
+                splines::Key::new(-1., 0.6, splines::Interpolation::Cosine),
+                splines::Key::new(-0.9, 0.7, splines::Interpolation::Cosine),
+                splines::Key::new(0., 0.8, splines::Interpolation::Cosine),
+                splines::Key::new(0.5, 0.85, splines::Interpolation::Cosine),
+                splines::Key::new(0.8, 0.9, splines::Interpolation::Cosine),
+                splines::Key::new(0.9, 1., splines::Interpolation::Cosine),
+                splines::Key::new(1.1, 1.5, splines::Interpolation::default())
+            ]),
             chunks: HashMap::new(),
             //meshes: HashMap::new(),
         }
@@ -35,11 +48,14 @@ impl VoxelWorld {
                 let wz = z + new_pos.z;
 
                 let some_pos = Vec2::new(wx as f32, wz as f32) * 0.01;
-                let sample = self.world_noise.get([some_pos.x as f64, some_pos.y as f64]);
+                let mut sample = self.world_noise.get([some_pos.x as f64, some_pos.y as f64]);
+
+                let vert = self.verticality.get([some_pos.x as f64, some_pos.y as f64]);
+
+                sample *= (CHUNK_SIZE_F64 * 4.0) * self.spline_points.sample(vert).unwrap();
 
                 // Determine which voxels are going to be solid
-                let world_height = (sample * 32.0 + 32.0) as i32;
-                let local_height = i32::min(world_height - new_pos.y, CHUNK_SIZE);
+                let local_height = i32::min((sample as i32) - new_pos.y, CHUNK_SIZE);
 
                 for y in 0..CHUNK_SIZE {
                     let index = voxel_index(x, y, z);
