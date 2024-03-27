@@ -25,9 +25,9 @@ fn setup_world(
     mut materials: ResMut<Assets<StandardMaterial>>,
     settings: Res<Settings>
 ) {
-    for x in 0..9 {
+    for x in 0..20 {
         for y in -2..9 {
-            for z in 0..9 {
+            for z in 0..20 {
                 let chunk_pos = IVec3::new(x, y, z);
                 voxel_world.generate_chunk(chunk_pos);
             }
@@ -39,7 +39,7 @@ fn setup_world(
         let mut chunk_mesh = ChunkMesh::default();
         chunk_mesh.build_chunk_mesh(&chunk, &voxel_world.chunks, &settings);
 
-        let mesh_handle = meshes.add(setup_bevy_mesh(chunk_mesh.mesh));
+        let mesh_handle = meshes.add(setup_bevy_mesh(chunk_mesh.mesh, false));
 
         commands.spawn(PbrBundle {
             mesh: mesh_handle,
@@ -51,13 +51,14 @@ fn setup_world(
         });
 
         if !chunk_mesh.liquid_mesh.vertices.is_empty() {
-            let mesh_handle = meshes.add(setup_bevy_mesh(chunk_mesh.liquid_mesh));
+            let mesh_handle = meshes.add(setup_bevy_mesh(chunk_mesh.liquid_mesh, true));
 
             commands.spawn((PbrBundle {
                 mesh: mesh_handle,
                 material: materials.add(StandardMaterial {
+                    base_color: Color::rgba(1., 1., 1., 0.9),
                     base_color_texture: Some(texture.clone()),
-                    alpha_mode: AlphaMode::Add,
+                    alpha_mode: AlphaMode::Blend,
                     cull_mode: None,
                     ..default()
                 }),
@@ -72,13 +73,15 @@ fn setup_world(
     });
 }
 
-fn setup_bevy_mesh(voxel_mesh: crate::voxel::mesh::Mesh) -> Mesh {
+fn setup_bevy_mesh(voxel_mesh: crate::voxel::mesh::Mesh, liquid: bool) -> Mesh {
     let mut mesh = Mesh::new(PrimitiveTopology::TriangleList, RenderAssetUsages::RENDER_WORLD);
 
     mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, voxel_mesh.vertices.clone());
     mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, voxel_mesh.normals);
     mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, voxel_mesh.uvs);
-    mesh.insert_attribute(Mesh::ATTRIBUTE_COLOR, voxel_mesh.colors);
+    if !liquid {
+        mesh.insert_attribute(Mesh::ATTRIBUTE_COLOR, voxel_mesh.colors);
+    }
 
     mesh.insert_indices(Indices::U32(voxel_mesh.indices));
 
