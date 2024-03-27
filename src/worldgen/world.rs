@@ -21,13 +21,10 @@ impl Default for VoxelWorld {
             world_noise: Fbm::<Perlin>::new(42069).set_octaves(6),
             verticality: Perlin::new(42069),
             spline_points: Spline::from_vec(vec![
-                splines::Key::new(-1., 0.6, splines::Interpolation::Linear),
-                splines::Key::new(-0.9, 0.7, splines::Interpolation::Linear),
-                splines::Key::new(0., 0.8, splines::Interpolation::Linear),
-                splines::Key::new(0.5, 0.85, splines::Interpolation::Linear),
-                splines::Key::new(0.8, 0.9, splines::Interpolation::Linear),
-                splines::Key::new(0.9, 1., splines::Interpolation::Linear),
-                splines::Key::new(1.1, 1.5, splines::Interpolation::default())
+                splines::Key::new(-1., 0.5, splines::Interpolation::Linear),
+                splines::Key::new(0.3, 1.0, splines::Interpolation::Linear),
+                splines::Key::new(0.4, 3.0, splines::Interpolation::Linear),
+                splines::Key::new(1.1, 3.0, splines::Interpolation::default())
             ]),
             chunks: HashMap::new(),
             //meshes: HashMap::new(),
@@ -70,13 +67,7 @@ impl VoxelWorld {
                     }
 
                     if wy <= sample {
-                        if wy <= 30.0 {
-                            chunk.voxels[index].voxel_type = VoxelType::GRASS;
-                            continue;
-                        } else {
-                            chunk.voxels[index].voxel_type = VoxelType::STONE;
-                            continue;
-                        }
+                        chunk.voxels[index].voxel_type = VoxelType::STONE;
                     }
                 }
             }
