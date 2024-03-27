@@ -26,7 +26,7 @@ fn setup_world(
     settings: Res<Settings>
 ) {
     for x in 0..20 {
-        for y in -2..9 {
+        for y in -5..7 {
             for z in 0..20 {
                 let chunk_pos = IVec3::new(x, y, z);
                 voxel_world.generate_chunk(chunk_pos);

@@ -18,12 +18,21 @@ pub struct VoxelWorld {
 impl Default for VoxelWorld {
     fn default() -> Self {
         Self {
-            world_noise: Fbm::<Perlin>::new(42069).set_octaves(6),
-            verticality: Perlin::new(42069),
+            world_noise: Fbm::<Perlin>::new(6346547).set_octaves(6).set_lacunarity(2.0).set_persistence(0.5),
+            verticality: Perlin::new(6346547),
             spline_points: Spline::from_vec(vec![
-                splines::Key::new(-1., 0.5, splines::Interpolation::Linear),
-                splines::Key::new(0.3, 1.0, splines::Interpolation::Linear),
-                splines::Key::new(0.4, 3.0, splines::Interpolation::Linear),
+                splines::Key::new(-1., 0.3, splines::Interpolation::Linear),
+                splines::Key::new(-0.6, 0.35, splines::Interpolation::Linear),
+                splines::Key::new(-0.4, 1.0, splines::Interpolation::Linear),
+                splines::Key::new(-0.2, 1.0, splines::Interpolation::Linear),
+                splines::Key::new(0.0, 1.3, splines::Interpolation::Linear),
+                splines::Key::new(0.1, 1.4, splines::Interpolation::Linear),
+                splines::Key::new(0.2, 1.4, splines::Interpolation::Linear),
+                splines::Key::new(0.3, 1.4, splines::Interpolation::Linear),
+                splines::Key::new(0.4, 1.7, splines::Interpolation::Linear),
+                splines::Key::new(0.5, 2.0, splines::Interpolation::Linear),
+                splines::Key::new(0.6, 2.1, splines::Interpolation::Linear),
+                splines::Key::new(0.7, 3.0, splines::Interpolation::Linear),
                 splines::Key::new(1.1, 3.0, splines::Interpolation::default())
             ]),
             chunks: HashMap::new(),
